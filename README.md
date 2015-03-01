@@ -10,7 +10,7 @@ BloodMoon is provided to all persons for free.
 
 In short, BloodMoon may be distributed by anyone - this includes modpacks - under the following conditions:
 * You don't make money (profits or remuneration) from downloads - be this pay-gating (AdFly) or other revenue;
-* You distribute LanteaCraft un-modified and in whole; and
+* You distribute BloodMoon un-modified and in whole; and
 * We'd much like it if you linked back to our website (or the Github repository).
 
 For more information about what is permitted and what is not permitted by the license, please see [license.md](LICENSE.md).
