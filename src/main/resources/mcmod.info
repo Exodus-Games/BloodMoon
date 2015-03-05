@@ -1,0 +1,18 @@
+[{
+	"modid": "BloodMoon",
+	"name": "BloodMoon",
+	"description": "Adds a Bloodmoon to the game world that happens ones a week in the MC time scale causing mobs to get very angry and attack players in an invasion style attack.!",
+	"version": "${version}",
+	"mcversion": "${mcversion}",
+	"url": "http://deltacraft.deltastrium.com/",
+	"updateUrl": "",
+	"authors": [ "DrakeBD", "ZelousCoder" ],
+	"credits": "The DeltaCraft Team.",
+	"logoFile": "/assets/textures/forge/BloodMoon.png",
+	"screenshots": [ ],
+	"parent": "",
+	"requiredMods": [ "Forge" ],
+	"dependencies": [ "" ],
+	"dependants": [ ],
+	"useDependencyInformation": "true"
+}]
