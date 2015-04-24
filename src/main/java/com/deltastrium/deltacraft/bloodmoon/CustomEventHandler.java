@@ -1,13 +1,21 @@
 package com.deltastrium.deltacraft.bloodmoon;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.EntityCreature;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.WorldEvent;
+
+import com.anor.behaviortree.Composite;
+import com.anor.behaviortree.InverterNode;
+import com.anor.behaviortree.LeafNode;
+import com.anor.behaviortree.Node;
+import com.deltastrium.deltacraft.bloodmoon.entity.monster.AttackPlayerAction;
+import com.deltastrium.deltacraft.bloodmoon.entity.monster.BloodmoonAIBase;
+import com.deltastrium.deltacraft.bloodmoon.entity.monster.EntityBloodWorm;
+import com.deltastrium.deltacraft.bloodmoon.entity.monster.FindPlayerAction;
+import com.deltastrium.deltacraft.bloodmoon.entity.monster.FindRandomPath;
+import com.deltastrium.deltacraft.bloodmoon.entity.monster.MoveToPlayerAction;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
 
@@ -18,8 +26,6 @@ import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
  */
 public class CustomEventHandler {
 
-	private Set<EntityMob>	tracker		= new HashSet<EntityMob>();
-
 	@SubscribeEvent
 	public void init(WorldEvent.Load event) {
 		if (event.world != null) {
@@ -28,44 +34,43 @@ public class CustomEventHandler {
 		} else {
 			System.out.println("[WORLDEVENT] THE WORLD HAS NOT LOADED YET");
 		}
+
 	}
 
 	@SubscribeEvent
 	public void init(ServerTickEvent event) {
-		// collection for removal
-		Set<EntityMob> dead = new HashSet<EntityMob>();
-		
-		// all mobs we're tracking shouldn't take long
-		for (EntityMob mob : tracker) {
-			if (mob.isDead) {
-				dead.add(mob);
-			}
 
-			// costly method inside so we'll only do it if we need to
-			if (mob.getAttackTarget() == null) {
-				// find the closest player within a good amount of range
-				EntityPlayer closestPlayerToEntity = mob.worldObj.getClosestPlayerToEntity(mob, 1000d);
-				
-				// since the target has not been set we'll set it now, mob will always go after player.
-				mob.setTarget(closestPlayerToEntity);
-				mob.setAttackTarget(closestPlayerToEntity);
-			}
-		}
-		
-		tracker.removeAll(dead);
 	}
 
 	@SubscribeEvent
-	public void init(LivingSpawnEvent event) {
-		if (event.entityLiving instanceof EntityMob) {
-			EntityPlayer closestPlayerToEntity = event.world.getClosestPlayerToEntity(event.entityLiving, 10000d);
-			if (closestPlayerToEntity != null) {
-				// this won't last so we'll revert it later in ticks
-				EntityMob mob = (EntityMob) event.entityLiving;
-				mob.setTarget(closestPlayerToEntity);
-				mob.setAttackTarget(closestPlayerToEntity);
-				tracker.add(mob);
+	public void init(LivingSpawnEvent.CheckSpawn event) {
+
+	}
+
+	@SubscribeEvent
+	public void init(LivingUpdateEvent event) {
+		if (!(event.entityLiving instanceof EntityBloodWorm) && event.entity instanceof EntityCreature) {
+			EntityCreature creature = (EntityCreature) event.entity;
+			if (creature.tasks.taskEntries.size() == 0 || !(creature.tasks.taskEntries.get(0) instanceof BloodmoonAIBase)) {
+				creature.tasks.taskEntries.clear();
+				creature.tasks.addTask(0, new BloodmoonAIBase(creature, getZombieTree()));
 			}
 		}
+	}
+
+	private static Node<EntityCreature> getZombieTree() {
+		Composite<EntityCreature> root = new Composite.InOrderSequence<EntityCreature>();
+
+		Composite<EntityCreature> attack = new Composite.InOrderSequence<EntityCreature>();
+
+		attack.addChild(new LeafNode<EntityCreature>(new FindPlayerAction(10d)));
+		attack.addChild(new LeafNode<EntityCreature>(new MoveToPlayerAction(1.0d)));
+		attack.addChild(new LeafNode<EntityCreature>(new AttackPlayerAction()));
+
+		root.addChild(new InverterNode<EntityCreature>(attack));
+
+		root.addChild(new LeafNode<EntityCreature>(new FindRandomPath()));
+
+		return root;
 	}
 }
