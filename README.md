@@ -1,6 +1,6 @@
 BloodMoon
 ================
-BloodMoon is a mod created for Minecraft by DeltaStrium/DeltaCraft that adds a Bloodmoon to the game world that happens ones a week in the MC time scale causing mobs to get very angry and attack players in an invasion style attack.
+BloodMoon is a mod created for Minecraft by Exodus-Games that adds a Bloodmoon to the game world that happens ones a week in the MC time scale causing mobs to get very angry and attack players in an invasion style attack.
 
 
 License
